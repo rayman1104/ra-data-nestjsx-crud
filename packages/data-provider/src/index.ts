@@ -145,7 +145,7 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
   delete: (resource, params) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {
       method: 'DELETE',
-    }).then(({ json }) => ({ data: json })),
+    }).then(({ json }) => ({ data: { ...json, id: params.id } })),
 
   deleteMany: (resource, params) =>
     Promise.all(
