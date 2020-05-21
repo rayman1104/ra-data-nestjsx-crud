@@ -37,8 +37,16 @@ const composeFilter = (paramsFilter: any): QueryFilter[] => {
   const flatFilter = fetchUtils.flattenObject(paramsFilter);
   return Object.keys(flatFilter).map((key) => {
     const splitKey = key.split('||');
-    const ops = splitKey[1] ? splitKey[1] : 'cont';
+
     let field = splitKey[0];
+    let ops = splitKey[1];
+    if (!ops) {
+      if (typeof flatFilter[key] === 'number' || flatFilter[key].match(/^\d+$/)) {
+        ops = CondOperator.EQUALS;
+      } else {
+        ops = CondOperator.CONTAINS;
+      }
+    }
 
     if (field.startsWith('_') && field.includes('.')) {
       field = field.split(/\.(.+)/)[1];
