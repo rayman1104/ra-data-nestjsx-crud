@@ -2,6 +2,7 @@ import { CondOperator, QueryFilter, QuerySort, RequestQueryBuilder } from '@nest
 import omitBy from 'lodash.omitby';
 import { DataProvider } from 'ra-core';
 import { fetchUtils } from 'react-admin';
+import { stringify } from 'querystring';
 
 /**
  * Maps react-admin queries to a nestjsx/crud powered REST API
@@ -30,10 +31,6 @@ const countDiff = (o1: Record<string, any>, o2: Record<string, any>): Record<str
   omitBy(o1, (v, k) => o2[k] === v);
 
 const composeFilter = (paramsFilter: any): QueryFilter[] => {
-  if (paramsFilter === '' || (typeof paramsFilter.q !== 'undefined' && paramsFilter.q === '')) {
-    paramsFilter = {};
-  }
-
   const flatFilter = fetchUtils.flattenObject(paramsFilter);
   return Object.keys(flatFilter).map((key) => {
     const splitKey = key.split('||');
@@ -55,18 +52,28 @@ const composeFilter = (paramsFilter: any): QueryFilter[] => {
   });
 };
 
+const composeQueryParams = (queryParams: any = {}): string => {
+  return stringify(fetchUtils.flattenObject(queryParams));
+}
+
+const mergeEncodedQueries = (...encodedQueries) => encodedQueries.map((query) => query).join('&')
+
 export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider => ({
   getList: (resource, params) => {
     const { page, perPage } = params.pagination;
+    const { q: queryParams, ...filter} = params.filter || {}
 
-    const query = RequestQueryBuilder.create({
-      filter: composeFilter(params.filter),
+    const encodedQueryParams = composeQueryParams(queryParams)
+    const encodedQueryFilter = RequestQueryBuilder.create({
+      filter: composeFilter(filter)
     })
       .setLimit(perPage)
       .setPage(page)
       .sortBy(params.sort as QuerySort)
       .setOffset((page - 1) * perPage)
       .query();
+
+    const query = mergeEncodedQueries(encodedQueryParams, encodedQueryFilter);
 
     const url = `${apiUrl}/${resource}?${query}`;
 
@@ -97,7 +104,8 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
 
   getManyReference: (resource, params) => {
     const { page, perPage } = params.pagination;
-    const filter: QueryFilter[] = composeFilter(params.filter);
+    const { q: queryParams, ...otherFilters} = params.filter || {}
+    const filter: QueryFilter[] = composeFilter(otherFilters);
 
     filter.push({
       field: params.target,
@@ -105,13 +113,16 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
       value: params.id,
     });
 
-    const query = RequestQueryBuilder.create({
-      filter,
+    const encodedQueryParams = composeQueryParams(queryParams)
+    const encodedQueryFilter = RequestQueryBuilder.create({
+      filter
     })
       .sortBy(params.sort as QuerySort)
       .setLimit(perPage)
       .setOffset((page - 1) * perPage)
       .query();
+
+    const query = mergeEncodedQueries(encodedQueryParams, encodedQueryFilter);
 
     const url = `${apiUrl}/${resource}?${query}`;
 

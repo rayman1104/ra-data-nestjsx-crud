@@ -19,6 +19,7 @@
   "scripts": {
     "prepare": "install-peers",
     "build": "tsc -b",
+    "build:watch": "tsc -b -w",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
