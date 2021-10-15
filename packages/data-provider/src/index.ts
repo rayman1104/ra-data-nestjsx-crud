@@ -37,7 +37,7 @@ const composeFilter = (paramsFilter: any): QueryFilter[] => {
     let field = splitKey[0];
     let ops = splitKey[1];
     if (!ops) {
-      if (typeof flatFilter[key] === 'number' || flatFilter[key].match(/^\d+$/)) {
+      if (typeof flatFilter[key] === 'boolean' || typeof flatFilter[key] === 'number' || (typeof flatFilter[key] === 'string' && flatFilter[key].match(/^\d+$/))) {
         ops = CondOperator.EQUALS;
       } else {
         ops = CondOperator.CONTAINS;
