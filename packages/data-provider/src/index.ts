@@ -98,7 +98,7 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
 
     const url = `${apiUrl}/${resource}?${query}`;
 
-    return httpClient(url).then(({ json }) => ({ data: json }));
+    return httpClient(url).then(({ json }) => ({ data: json.data }));
   },
 
   getManyReference: (resource, params) => {
