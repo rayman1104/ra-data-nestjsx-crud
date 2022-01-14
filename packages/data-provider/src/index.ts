@@ -60,11 +60,12 @@ const mergeEncodedQueries = (...encodedQueries) => encodedQueries.map((query) =>
 export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider => ({
   getList: (resource, params) => {
     const { page, perPage } = params.pagination;
-    const { q: queryParams, ...filter} = params.filter || {}
+    const { q: queryParams, $OR: orFilter, ...filter } = params.filter || {};
 
     const encodedQueryParams = composeQueryParams(queryParams)
     const encodedQueryFilter = RequestQueryBuilder.create({
-      filter: composeFilter(filter)
+      filter: composeFilter(filter),
+      or: composeFilter(orFilter || {})
     })
       .setLimit(perPage)
       .setPage(page)
