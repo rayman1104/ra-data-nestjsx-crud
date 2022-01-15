@@ -1,7 +1,7 @@
 import { CondOperator, QueryFilter, QuerySort, RequestQueryBuilder } from '@nestjsx/crud-request';
 import omitBy from 'lodash.omitby';
 import { DataProvider, fetchUtils } from 'ra-core';
-import { stringify } from 'querystring';
+import { stringify } from 'query-string';
 
 /**
  * Maps react-admin queries to a nestjsx/crud powered REST API
@@ -52,7 +52,7 @@ const composeFilter = (paramsFilter: any): QueryFilter[] => {
 };
 
 const composeQueryParams = (queryParams: any = {}): string => {
-  return stringify(fetchUtils.flattenObject(queryParams));
+  return stringify(fetchUtils.flattenObject(queryParams),{skipNull:true});
 }
 
 const mergeEncodedQueries = (...encodedQueries) => encodedQueries.map((query) => query).join('&')

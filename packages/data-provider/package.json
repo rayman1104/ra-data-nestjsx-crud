@@ -33,7 +33,8 @@
   },
   "dependencies": {
     "@nestjsx/crud-request": "^4.1.0",
-    "lodash.omitby": "^4.6.0"
+    "lodash.omitby": "^4.6.0",
+    "query-string": "^7.1.0"
   },
   "peerDependencies": {
     "react-admin": "^3.0.0"
