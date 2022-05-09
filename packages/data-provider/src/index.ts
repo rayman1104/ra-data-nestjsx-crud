@@ -33,11 +33,12 @@ const composeFilter = (paramsFilter: any): QueryFilter[] => {
   const flatFilter = fetchUtils.flattenObject(paramsFilter);
   return Object.keys(flatFilter).map((key) => {
     const splitKey = key.split('||');
+    const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
 
     let field = splitKey[0];
     let ops = splitKey[1];
     if (!ops) {
-      if (typeof flatFilter[key] === 'boolean' || typeof flatFilter[key] === 'number' || (typeof flatFilter[key] === 'string' && flatFilter[key].match(/^\d+$/))) {
+      if (typeof flatFilter[key] === 'boolean' || typeof flatFilter[key] === 'number' || (typeof flatFilter[key] === 'string' && (flatFilter[key].match(/^\d+$/)) || flatFilter[key].match(uuidRegex))) {
         ops = CondOperator.EQUALS;
       } else {
         ops = CondOperator.CONTAINS;
