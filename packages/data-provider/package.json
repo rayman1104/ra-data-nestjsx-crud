@@ -28,7 +28,7 @@
   "devDependencies": {
     "@types/lodash.omitby": "^4.6.6",
     "install-peers-cli": "^2.2.0",
-    "ra-core": "^3.4.1",
+    "ra-core": "^3.10.4",
     "typescript": "^3.8.3"
   },
   "dependencies": {
