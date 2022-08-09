@@ -33,7 +33,7 @@ const composeFilter = (paramsFilter: any): QueryFilter[] => {
   const flatFilter = fetchUtils.flattenObject(paramsFilter);
   return Object.keys(flatFilter).map((key) => {
     const splitKey = key.split('||');
-    const uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/gi;
 
     let field = splitKey[0];
     let ops = splitKey[1];
