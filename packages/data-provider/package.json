@@ -26,15 +26,15 @@
     "url": "https://github.com/rayman1104/ra-data-nestjsx-crud/issues"
   },
   "devDependencies": {
-    "@types/lodash.omitby": "^4.6.6",
+    "@types/lodash.omitby": "^4.6.7",
     "install-peers-cli": "^2.2.0",
-    "ra-core": "^3.10.4",
-    "typescript": "^3.8.3"
+    "ra-core": "^4.2.6",
+    "typescript": "^4.7.4"
   },
   "dependencies": {
     "@nestjsx/crud-request": "^4.1.0",
     "lodash.omitby": "^4.6.0",
-    "query-string": "^7.1.0"
+    "query-string": "^7.1.1"
   },
   "peerDependencies": {
     "react-admin": "^3.0.0"
