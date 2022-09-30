@@ -32,7 +32,7 @@ const countDiff = (o1: Record<string, any>, o2: Record<string, any>): Record<str
 const composeFilter = (paramsFilter: any): QueryFilter[] => {
   const flatFilter = fetchUtils.flattenObject(paramsFilter);
   return Object.keys(flatFilter).map((key) => {
-    const splitKey = key.split('||');
+    const splitKey = key.split(/\|\||:/)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/gi;
 
     let field = splitKey[0];
