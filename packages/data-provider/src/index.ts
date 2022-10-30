@@ -1,5 +1,5 @@
 import { CondOperator, QueryFilter, QuerySort, RequestQueryBuilder } from '@nestjsx/crud-request';
-import omitBy from 'lodash.omitby';
+import omitBy from 'lodash.omitBy';
 import { DataProvider, fetchUtils } from 'ra-core';
 import { stringify } from 'query-string';
 
@@ -32,7 +32,7 @@ const countDiff = (o1: Record<string, any>, o2: Record<string, any>): Record<str
 const composeFilter = (paramsFilter: any): QueryFilter[] => {
   const flatFilter = fetchUtils.flattenObject(paramsFilter);
   return Object.keys(flatFilter).map((key) => {
-    const splitKey = key.split('||');
+    const splitKey = key.split(/\|\||:/)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/gi;
 
     let field = splitKey[0];
@@ -41,7 +41,7 @@ const composeFilter = (paramsFilter: any): QueryFilter[] => {
       if (typeof flatFilter[key] === 'boolean' || typeof flatFilter[key] === 'number' || (typeof flatFilter[key] === 'string' && (flatFilter[key].match(/^\d+$/)) || flatFilter[key].match(uuidRegex))) {
         ops = CondOperator.EQUALS;
       } else {
-        ops = CondOperator.CONTAINS;
+        ops = CondOperator.CONTAINS_LOW;
       }
     }
 
