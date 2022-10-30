@@ -37,6 +37,6 @@
     "query-string": "^7.1.1"
   },
   "peerDependencies": {
-    "react-admin": "^3.0.0"
+    "react-admin": ">=3.0.0"
   }
 }
