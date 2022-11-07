@@ -1,7 +1,9 @@
 # Nest.js API Data Provider For React-Admin
 
-```ra-data-nestjsx-crud``` is a data-provider for [react-admin](https://github.com/marmelab/react-admin) that has been designed to make easier communication between a frontend application built with [react-admin](https://github.com/marmelab/react-admin) and
-a backend application built via [nestjs](https://github.com/nestjs/nest) framework with [nestjsx/crud](https://github.com/nestjsx/crud) plugin.
+```ra-data-nestjsx-crud``` is a fork of [@FusionWorks/ra-data-nest-crud](https://github.com/FusionWorks/react-admin-nestjsx-crud-dataprovider).
+
+```ra-data-nestjsx-crud``` is a data-provider for [react-admin](https://github.com/marmelab/react-admin), that has been designed to make easier communication between a frontend application built with [react-admin](https://github.com/marmelab/react-admin),
+and a backend application built with [nestjs](https://github.com/nestjs/nest) framework and [nestjsx/crud](https://github.com/nestjsx/crud).
 
 ## Install
 
@@ -29,7 +31,3 @@ const App = () => (
 );
 export default App;
 ```
-
-## Notes
-
-Started as a fork of [@FusionWorks/ra-data-nest-crud](https://github.com/FusionWorks/react-admin-nestjsx-crud-dataprovider) which is now discontinued.
