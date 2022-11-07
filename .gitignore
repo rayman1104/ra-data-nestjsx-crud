@@ -1,5 +1,10 @@
-node_modules/
+# os
+.DS_Store
+
+# package directories
+node_modules
+
+# other
 lerna-debug.log
 npm-debug.log
 .idea
-lib/
