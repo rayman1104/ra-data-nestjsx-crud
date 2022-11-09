@@ -1,5 +1,5 @@
 import { CondOperator, QueryFilter, QuerySort, RequestQueryBuilder } from '@nestjsx/crud-request';
-import omitBy from 'lodash.omitBy';
+import omitBy from 'lodash.omitby';
 import { DataProvider, fetchUtils } from 'ra-core';
 import { stringify } from 'query-string';
 
