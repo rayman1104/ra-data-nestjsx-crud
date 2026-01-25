@@ -190,7 +190,7 @@ export default (
       body,
       headers,
     }).then(({ json }) => ({
-      data: { ...params.data, id: json.id },
+      data: { ...json },
     }))
   },
 
