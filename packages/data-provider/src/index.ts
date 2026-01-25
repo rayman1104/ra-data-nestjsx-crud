@@ -78,7 +78,7 @@ export default (
   httpClient = fetchUtils.fetchJson,
 ): DataProvider => ({
   getList: (resource, params) => {
-    const { page, perPage } = params.pagination
+    const { page, perPage } = params.pagination || { page: 1, perPage: 10 }
     const { q: queryParams, $OR: orFilter, ...filter } = params.filter || {}
 
     const encodedQueryParams = composeQueryParams(queryParams)
@@ -156,7 +156,9 @@ export default (
     const data = countDiff(params.data, params.previousData)
     const body = data instanceof FormData ? data : JSON.stringify(data)
     const headers =
-      typeof body === 'string' ? {} : { 'Content-Type': 'multipart/form-data' }
+      typeof body === 'string'
+        ? undefined
+        : new Headers({ 'Content-Type': 'multipart/form-data' })
 
     return httpClient(`${apiUrl}/${resource}/${params.id}`, {
       method: 'PATCH',
@@ -183,7 +185,9 @@ export default (
         ? params.data
         : JSON.stringify(params.data)
     const headers =
-      typeof body === 'string' ? {} : { 'Content-Type': 'multipart/form-data' }
+      typeof body === 'string'
+        ? undefined
+        : new Headers({ 'Content-Type': 'multipart/form-data' })
 
     return httpClient(`${apiUrl}/${resource}`, {
       method: 'POST',
