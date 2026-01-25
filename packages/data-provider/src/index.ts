@@ -1,7 +1,12 @@
-import { CondOperator, QueryFilter, QuerySort, RequestQueryBuilder } from '@nestjsx/crud-request';
-import omitBy from 'lodash.omitby';
-import { DataProvider, fetchUtils } from 'ra-core';
-import { stringify } from 'query-string';
+import {
+  CondOperator,
+  QueryFilter,
+  QuerySort,
+  RequestQueryBuilder,
+} from '@nestjsx/crud-request'
+import omitBy from 'lodash.omitby'
+import { DataProvider, fetchUtils } from 'ra-core'
+import { stringify } from 'query-string'
 
 /**
  * Maps react-admin queries to a nestjsx/crud powered REST API
@@ -26,62 +31,75 @@ import { stringify } from 'query-string';
  * export default App;
  */
 
-const countDiff = (o1: Record<string, any>, o2: Record<string, any>): Record<string, any> =>
-  omitBy(o1, (v, k) => o2[k] === v);
+const countDiff = (
+  o1: Record<string, any>,
+  o2: Record<string, any>,
+): Record<string, any> => omitBy(o1, (v, k) => o2[k] === v)
 
 const composeFilter = (paramsFilter: any): QueryFilter[] => {
-  const flatFilter = fetchUtils.flattenObject(paramsFilter);
+  const flatFilter = fetchUtils.flattenObject(paramsFilter)
   return Object.keys(flatFilter).map((key) => {
     const splitKey = key.split(/\|\||:/)
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/gi;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/gi
 
-    let field = splitKey[0];
-    let ops = splitKey[1];
+    let field = splitKey[0]
+    let ops = splitKey[1]
     if (!ops) {
-      if (typeof flatFilter[key] === 'boolean' || typeof flatFilter[key] === 'number' || (typeof flatFilter[key] === 'string' && (flatFilter[key].match(/^\d+$/)) || flatFilter[key].match(uuidRegex))) {
-        ops = CondOperator.EQUALS;
+      if (
+        typeof flatFilter[key] === 'boolean' ||
+        typeof flatFilter[key] === 'number' ||
+        (typeof flatFilter[key] === 'string' &&
+          flatFilter[key].match(/^\d+$/)) ||
+        flatFilter[key].match(uuidRegex)
+      ) {
+        ops = CondOperator.EQUALS
       } else {
-        ops = CondOperator.CONTAINS_LOW;
+        ops = CondOperator.CONTAINS_LOW
       }
     }
 
     if (field.startsWith('_') && field.includes('.')) {
-      field = field.split(/\.(.+)/)[1];
+      field = field.split(/\.(.+)/)[1]
     }
-    return { field, operator: ops, value: flatFilter[key] } as QueryFilter;
-  });
-};
-
-const composeQueryParams = (queryParams: any = {}): string => {
-  return stringify(fetchUtils.flattenObject(queryParams),{skipNull:true});
+    return { field, operator: ops, value: flatFilter[key] } as QueryFilter
+  })
 }
 
-const mergeEncodedQueries = (...encodedQueries) => encodedQueries.map((query) => query).join('&')
+const composeQueryParams = (queryParams: any = {}): string => {
+  return stringify(fetchUtils.flattenObject(queryParams), { skipNull: true })
+}
 
-export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider => ({
+const mergeEncodedQueries = (...encodedQueries) =>
+  encodedQueries.map((query) => query).join('&')
+
+export default (
+  apiUrl: string,
+  httpClient = fetchUtils.fetchJson,
+): DataProvider => ({
   getList: (resource, params) => {
-    const { page, perPage } = params.pagination;
-    const { q: queryParams, $OR: orFilter, ...filter } = params.filter || {};
+    const { page, perPage } = params.pagination
+    const { q: queryParams, $OR: orFilter, ...filter } = params.filter || {}
 
     const encodedQueryParams = composeQueryParams(queryParams)
     const encodedQueryFilter = RequestQueryBuilder.create({
       filter: composeFilter(filter),
-      or: composeFilter(orFilter || {})
+      or: composeFilter(orFilter || {}),
     })
       .setLimit(perPage)
       .setPage(page)
       .sortBy(params.sort as QuerySort)
       .setOffset((page - 1) * perPage)
-      .query();
+      .query()
 
-    const query = mergeEncodedQueries(encodedQueryParams, encodedQueryFilter);
+    const query = mergeEncodedQueries(encodedQueryParams, encodedQueryFilter)
 
-    const url = `${apiUrl}/${resource}?${query}`;
+    const url = `${apiUrl}/${resource}?${query}`
 
     return httpClient(url).then(({ json }) => ({
       data: json.data,
       total: json.total,
-    }));
+    }))
   },
 
   getOne: (resource, params) =>
@@ -96,50 +114,55 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
         operator: CondOperator.IN,
         value: `${params.ids}`,
       })
-      .query();
+      .query()
 
-    const url = `${apiUrl}/${resource}?${query}`;
+    const url = `${apiUrl}/${resource}?${query}`
 
-    return httpClient(url).then(({ json }) => ({ data: json.data || json }));
+    return httpClient(url).then(({ json }) => ({ data: json.data || json }))
   },
 
   getManyReference: (resource, params) => {
-    const { page, perPage } = params.pagination;
-    const { q: queryParams, ...otherFilters} = params.filter || {}
-    const filter: QueryFilter[] = composeFilter(otherFilters);
+    const { page, perPage } = params.pagination
+    const { q: queryParams, ...otherFilters } = params.filter || {}
+    const filter: QueryFilter[] = composeFilter(otherFilters)
 
     filter.push({
       field: params.target,
       operator: CondOperator.EQUALS,
       value: params.id,
-    });
+    })
 
     const encodedQueryParams = composeQueryParams(queryParams)
     const encodedQueryFilter = RequestQueryBuilder.create({
-      filter
+      filter,
     })
       .sortBy(params.sort as QuerySort)
       .setLimit(perPage)
       .setOffset((page - 1) * perPage)
-      .query();
+      .query()
 
-    const query = mergeEncodedQueries(encodedQueryParams, encodedQueryFilter);
+    const query = mergeEncodedQueries(encodedQueryParams, encodedQueryFilter)
 
-    const url = `${apiUrl}/${resource}?${query}`;
+    const url = `${apiUrl}/${resource}?${query}`
 
     return httpClient(url).then(({ json }) => ({
       data: json.data,
       total: json.total,
-    }));
+    }))
   },
 
   update: (resource, params) => {
     // no need to send all fields, only updated fields are enough
-    const data = countDiff(params.data, params.previousData);
+    const data = countDiff(params.data, params.previousData)
+    const body = data instanceof FormData ? data : JSON.stringify(data)
+    const headers =
+      typeof body === 'string' ? {} : { 'Content-Type': 'multipart/form-data' }
+
     return httpClient(`${apiUrl}/${resource}/${params.id}`, {
       method: 'PATCH',
-      body: JSON.stringify(data),
-    }).then(({ json }) => ({ data: json }));
+      body,
+      headers,
+    }).then(({ json }) => ({ data: json }))
   },
 
   updateMany: (resource, params) =>
@@ -154,13 +177,22 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
       data: responses.map(({ json }) => json),
     })),
 
-  create: (resource, params) =>
-    httpClient(`${apiUrl}/${resource}`, {
+  create: (resource, params) => {
+    const body =
+      params.data instanceof FormData
+        ? params.data
+        : JSON.stringify(params.data)
+    const headers =
+      typeof body === 'string' ? {} : { 'Content-Type': 'multipart/form-data' }
+
+    return httpClient(`${apiUrl}/${resource}`, {
       method: 'POST',
-      body: JSON.stringify(params.data),
+      body,
+      headers,
     }).then(({ json }) => ({
       data: { ...params.data, id: json.id },
-    })),
+    }))
+  },
 
   delete: (resource, params) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {
@@ -175,4 +207,4 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
         }),
       ),
     ).then((responses) => ({ data: responses.map(({ json }) => json) })),
-});
+})
