@@ -136,9 +136,10 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
   update: (resource, params) => {
     // no need to send all fields, only updated fields are enough
     const data = countDiff(params.data, params.previousData);
+    const body = data instanceof FormData ? data : JSON.stringify(data);
     return httpClient(`${apiUrl}/${resource}/${params.id}`, {
       method: 'PATCH',
-      body: JSON.stringify(data),
+      body,
     }).then(({ json }) => ({ data: json }));
   },
 
@@ -154,13 +155,15 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
       data: responses.map(({ json }) => json),
     })),
 
-  create: (resource, params) =>
-    httpClient(`${apiUrl}/${resource}`, {
+  create: (resource, params) => {
+    const body = params.data instanceof FormData ? params.data : JSON.stringify(params.data);
+    return httpClient(`${apiUrl}/${resource}`, {
       method: 'POST',
-      body: JSON.stringify(params.data),
+      body,
     }).then(({ json }) => ({
       data: { ...params.data, ...json },
-    })),
+    }));
+  },
 
   delete: (resource, params) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {
