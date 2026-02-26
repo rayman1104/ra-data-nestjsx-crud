@@ -1,0 +1,33 @@
+{
+  "name": "ra-data-nestjsx-crud-integration-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest --verbose --runInBand",
+    "start": "npx ts-node --project tsconfig.json src/server.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^9.4.3",
+    "@nestjs/core": "^9.4.3",
+    "@nestjs/platform-express": "^9.4.3",
+    "@nestjs/typeorm": "^9.0.1",
+    "@nestjs/testing": "^9.4.3",
+    "@nestjsx/crud": "^5.0.0-alpha.3",
+    "@nestjsx/crud-typeorm": "^5.0.0-alpha.3",
+    "typeorm": "^0.3.20",
+    "sql.js": "^1.10.3",
+    "reflect-metadata": "^0.1.14",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "@types/jest": "^29.5.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.9.5",
+    "ra-core": "^4.2.6",
+    "ra-data-nestjsx-crud": "file:../../packages/data-provider"
+  }
+}
