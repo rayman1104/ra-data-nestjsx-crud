@@ -58,13 +58,19 @@ const composeQueryParams = (queryParams: any = {}): string => {
 
 const mergeEncodedQueries = (...encodedQueries) => encodedQueries.map((query) => query).join('&')
 
+// Workaround: @nestjsx/crud-request uses qs with default arrayFormat ('indices'),
+// producing filter[0]=...&filter[1]=... but the crud backend expects repeated keys:
+// filter=...&filter=... Strip the [N] indices from encoded query strings.
+const fixArrayQuery = (query: string): string =>
+  query.replace(/%5B\d+%5D/g, '').replace(/\[\d+\]/g, '');
+
 export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider => ({
   getList: (resource, params) => {
     const { page, perPage } = params.pagination;
     const { q: queryParams, $OR: orFilter, ...filter } = params.filter || {};
 
     const encodedQueryParams = composeQueryParams(queryParams)
-    const encodedQueryFilter = RequestQueryBuilder.create({
+    const encodedQueryFilter = fixArrayQuery(RequestQueryBuilder.create({
       filter: composeFilter(filter),
       or: composeFilter(orFilter || {})
     })
@@ -72,7 +78,7 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
       .setPage(page)
       .sortBy(params.sort as QuerySort)
       .setOffset((page - 1) * perPage)
-      .query();
+      .query());
 
     const query = mergeEncodedQueries(encodedQueryParams, encodedQueryFilter);
 
@@ -90,13 +96,13 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
     })),
 
   getMany: (resource, params) => {
-    const query = RequestQueryBuilder.create()
+    const query = fixArrayQuery(RequestQueryBuilder.create()
       .setFilter({
         field: 'id',
         operator: CondOperator.IN,
         value: `${params.ids}`,
       })
-      .query();
+      .query());
 
     const url = `${apiUrl}/${resource}?${query}`;
 
@@ -115,13 +121,13 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
     });
 
     const encodedQueryParams = composeQueryParams(queryParams)
-    const encodedQueryFilter = RequestQueryBuilder.create({
+    const encodedQueryFilter = fixArrayQuery(RequestQueryBuilder.create({
       filter
     })
       .sortBy(params.sort as QuerySort)
       .setLimit(perPage)
       .setOffset((page - 1) * perPage)
-      .query();
+      .query());
 
     const query = mergeEncodedQueries(encodedQueryParams, encodedQueryFilter);
 
