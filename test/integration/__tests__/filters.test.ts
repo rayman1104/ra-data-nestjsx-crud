@@ -98,6 +98,21 @@ describe('filters', () => {
 
       expect(result.data).toHaveLength(0);
     });
+
+    it('uses IN for array values (cumulative filters)', async () => {
+      await seedPosts();
+
+      const result = await ctx.dataProvider.getList('posts', {
+        pagination: defaultPagination,
+        sort: defaultSort,
+        filter: { title: ['Alpha Post', 'Gamma Post'] },
+      });
+
+      expect(result.data).toHaveLength(2);
+      const titles = result.data.map((p: any) => p.title);
+      expect(titles).toContain('Alpha Post');
+      expect(titles).toContain('Gamma Post');
+    });
   });
 
   describe('explicit operators', () => {
