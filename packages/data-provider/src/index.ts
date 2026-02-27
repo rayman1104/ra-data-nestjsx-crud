@@ -66,7 +66,11 @@ const mergeEncodedQueries = (...encodedQueries) => encodedQueries.map((query) =>
 const fixArrayQuery = (query: string): string =>
   query.replace(/%5B\d+%5D/g, '').replace(/\[\d+\]/g, '');
 
-export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider => ({
+interface CrudProviderOptions {
+  forceFullUpdates?: boolean;
+}
+
+export default (apiUrl: string, httpClient = fetchUtils.fetchJson, options: CrudProviderOptions = {}): DataProvider => ({
   getList: (resource, params) => {
     const { page, perPage } = params.pagination;
     const { q: queryParams, $OR: orFilter, ...filter } = params.filter || {};
@@ -142,11 +146,10 @@ export default (apiUrl: string, httpClient = fetchUtils.fetchJson): DataProvider
   },
 
   update: (resource, params) => {
-    // no need to send all fields, only updated fields are enough
-    const data = countDiff(params.data, params.previousData);
+    const data = options.forceFullUpdates ? params.data : countDiff(params.data, params.previousData);
     const body = data instanceof FormData ? data : JSON.stringify(data);
     return httpClient(`${apiUrl}/${resource}/${params.id}`, {
-      method: 'PATCH',
+      method: options.forceFullUpdates ? 'PUT' : 'PATCH',
       body,
     }).then(({ json }) => ({ data: json }));
   },
