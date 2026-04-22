@@ -11,7 +11,7 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-admin": "^5.0.0",
+    "react-admin": "^5.14.6",
     "ra-data-nestjsx-crud": "file:../../packages/data-provider"
   },
   "devDependencies": {
